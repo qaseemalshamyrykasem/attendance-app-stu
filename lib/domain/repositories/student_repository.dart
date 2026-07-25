@@ -2,7 +2,6 @@
 library;
 
 import '../../data/models/student_model.dart';
-import '../entities/student_entity.dart';
 
 abstract class StudentRepository {
   /// الحصول على بيانات الطالب

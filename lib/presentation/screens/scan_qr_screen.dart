@@ -255,7 +255,7 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
 
           // طبقة التغطية
           Container(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
           ),
 
           // منطقة المسح
@@ -271,7 +271,7 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
                     border: Border.all(
                       color: _isProcessing 
                           ? AppColors.warning 
-                          : Colors.white.withOpacity(0.8),
+                          : Colors.white.withValues(alpha: 0.8),
                       width: 3,
                     ),
                     borderRadius: BorderRadius.circular(24),

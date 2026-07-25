@@ -47,14 +47,14 @@ class AttendanceStatusScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
-                  color: _getStatusColor().withOpacity(0.1),
+                  color: _getStatusColor().withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   message,
                   style: TextStyle(
                     fontSize: 16,
-                    color: _getStatusColor().withOpacity(0.9),
+                    color: _getStatusColor().withValues(alpha: 0.9),
                     fontFamily: 'Cairo',
                   ),
                   textAlign: TextAlign.center,
@@ -100,7 +100,7 @@ class AttendanceStatusScreen extends StatelessWidget {
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            color: AppColors.attendanceSuccess.withOpacity(0.1),
+            color: AppColors.attendanceSuccess.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -115,7 +115,7 @@ class AttendanceStatusScreen extends StatelessWidget {
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            color: AppColors.attendanceDuplicate.withOpacity(0.1),
+            color: AppColors.attendanceDuplicate.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -131,7 +131,7 @@ class AttendanceStatusScreen extends StatelessWidget {
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            color: AppColors.attendanceClosed.withOpacity(0.1),
+            color: AppColors.attendanceClosed.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -147,7 +147,7 @@ class AttendanceStatusScreen extends StatelessWidget {
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            color: AppColors.attendanceError.withOpacity(0.1),
+            color: AppColors.attendanceError.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -162,7 +162,7 @@ class AttendanceStatusScreen extends StatelessWidget {
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            color: AppColors.attendancePending.withOpacity(0.1),
+            color: AppColors.attendancePending.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: SizedBox(

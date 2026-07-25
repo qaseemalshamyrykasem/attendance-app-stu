@@ -51,7 +51,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     ));
   }
 
-  /// تفعيل/إلغاء الإشعارات (اسم بديل)
+  @override
   Future<void> toggleNotifications(bool value) async {
     await setNotificationsEnabled(value);
   }
@@ -137,7 +137,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     ));
   }
 
-  /// حفظ معلومات الاتصال (مساعد)
+  @override
   Future<void> saveConnectionInfo({required String ip, required int port}) async {
     await setLastIpAddress(ip);
     await setLastPort(port);
@@ -154,7 +154,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     };
   }
 
-  /// إعادة تعيين الإعدادات (اسم بديل)
+  @override
   Future<void> resetSettings() async {
     await resetToDefaults();
   }

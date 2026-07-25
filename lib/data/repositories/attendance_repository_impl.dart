@@ -44,7 +44,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
 
       if (response.success) {
         // تحديث سجل الاتصال كنجاح
-        await _updateConnectionLog(ip: '$ip', port: port, status: 'success');
+        await _updateConnectionLog(ip: ip, port: port, status: 'success');
 
         // حفظ سجل الحضور المحلي
         final attendanceRecord = AttendanceModel(
@@ -85,7 +85,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
         }
 
         await _updateConnectionLog(
-          ip: '$ip', 
+          ip: ip, 
           port: port, 
           status: 'failed',
           error: response.message,
@@ -120,7 +120,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     } catch (e) {
       // خطأ في الاتصال
       await _updateConnectionLog(
-        ip: '$ip', 
+        ip: ip, 
         port: port, 
         status: 'timeout',
         error: e.toString(),
@@ -182,7 +182,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     )).toList();
   }
 
-  /// البحث بالحالة فقط (للسجل)
+  @override
   Future<List<AttendanceEntity>> searchRecords({String? statusFilter}) async {
     return searchAttendanceRecords(statusFilter: statusFilter);
   }

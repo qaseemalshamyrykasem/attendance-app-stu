@@ -23,15 +23,20 @@ extension ColorExtension on Color {
 
   /// تحويل إلى سلسلة Hex
   String toHex({bool includeAlpha = false}) {
+    final r = (this.r * 255).round().clamp(0, 255);
+    final g = (this.g * 255).round().clamp(0, 255);
+    final b = (this.b * 255).round().clamp(0, 255);
+    final a = (this.a * 255).round().clamp(0, 255);
+
     if (includeAlpha) {
-      return '#${alpha.toRadixString(16).padLeft(2, '0')}'
-          '${red.toRadixString(16).padLeft(2, '0')}'
-          '${green.toRadixString(16).padLeft(2, '0')}'
-          '${blue.toRadixString(16).padLeft(2, '0')}';
+      return '#${a.toRadixString(16).padLeft(2, '0')}'
+          '${r.toRadixString(16).padLeft(2, '0')}'
+          '${g.toRadixString(16).padLeft(2, '0')}'
+          '${b.toRadixString(16).padLeft(2, '0')}';
     }
-    return '#${red.toRadixString(16).padLeft(2, '0')}'
-        '${green.toRadixString(16).padLeft(2, '0')}'
-        '${blue.toRadixString(16).padLeft(2, '0')}';
+    return '#${r.toRadixString(16).padLeft(2, '0')}'
+        '${g.toRadixString(16).padLeft(2, '0')}'
+        '${b.toRadixString(16).padLeft(2, '0')}';
   }
 }
 
