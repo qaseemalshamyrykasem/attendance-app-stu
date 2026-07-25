@@ -294,7 +294,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                   // القسم
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedDepartment,
+                    value: _selectedDepartment,
+                    isExpanded: true,
                     disabledHint: Text(
                       _selectedDepartment ?? '',
                       style: const TextStyle(fontFamily: 'Cairo'),
@@ -318,7 +319,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                   // المستوى
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedLevel,
+                    value: _selectedLevel,
+                    isExpanded: true,
                     disabledHint: Text(
                       _selectedLevel ?? '',
                       style: const TextStyle(fontFamily: 'Cairo'),

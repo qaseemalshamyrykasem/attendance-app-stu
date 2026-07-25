@@ -218,7 +218,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
               // القسم
               DropdownButtonFormField<String>(
-                initialValue: _selectedDepartment,
+                value: _selectedDepartment,
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'القسم *',
                   prefixIcon: Icon(Icons.business_outlined),
@@ -244,7 +245,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
               // المستوى
               DropdownButtonFormField<String>(
-                initialValue: _selectedLevel,
+                value: _selectedLevel,
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'المستوى *',
                   prefixIcon: Icon(Icons.school_outlined),
