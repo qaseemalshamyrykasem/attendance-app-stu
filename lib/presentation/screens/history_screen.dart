@@ -122,7 +122,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               color: Theme.of(context).colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 12.8),
+                  color: Colors.black.withOpacity(0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -181,7 +181,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       onSelected: (selected) {
         _loadRecords(statusFilter: selected ? value : null);
       },
-      selectedColor: AppColors.primary.withValues(alpha: 51.0),
+      selectedColor: AppColors.primary.withOpacity(0.2),
       checkmarkColor: AppColors.primary,
       labelStyle: TextStyle(
         color: isSelected ? AppColors.primary : Colors.grey.shade600,
@@ -243,8 +243,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 height: 48,
                 decoration: BoxDecoration(
                   color: isSuccess 
-                      ? AppColors.success.withValues(alpha: 25.5)
-                      : AppColors.error.withValues(alpha: 25.5),
+                      ? AppColors.success.withOpacity(0.1)
+                      : AppColors.error.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

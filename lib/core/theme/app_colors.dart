@@ -80,7 +80,7 @@ class AppThemeLight {
             fontFamily: 'Cairo',
           ),
         ),
-        cardTheme: CardThemeData(
+        cardTheme: const CardTheme(
           color: AppColors.surfaceLight,
           elevation: 2,
           shape: RoundedRectangleBorder(
@@ -176,7 +176,7 @@ class AppThemeLight {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        dialogTheme: DialogThemeData(
+        dialogTheme: DialogTheme(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -218,7 +218,7 @@ class AppThemeDark {
             color: AppColors.textPrimaryDark,
           ),
         ),
-        cardTheme: CardThemeData(
+        cardTheme: const CardTheme(
           color: AppColors.surfaceDark,
           elevation: 4,
           shape: RoundedRectangleBorder(
@@ -319,7 +319,7 @@ class AppThemeDark {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        dialogTheme: DialogThemeData(
+        dialogTheme: DialogTheme(
           backgroundColor: AppColors.surfaceDark,
           titleTextStyle: const TextStyle(
             fontFamily: 'Cairo',

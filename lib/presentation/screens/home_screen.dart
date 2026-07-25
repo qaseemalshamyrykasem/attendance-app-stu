@@ -120,7 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // الأفاتار
                   CircleAvatar(
                     radius: 32,
-                    backgroundColor: Colors.white.withValues(alpha: 51.0),
+                    backgroundColor: Colors.white.withOpacity(0.2),
                     child: student?.photoPath != null
                         ? ClipOval(
                             child: Image.file(
@@ -140,7 +140,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           greeting,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white.withValues(alpha: 204.0),
+                            color: Colors.white.withOpacity(0.8),
                             fontFamily: 'Cairo',
                           ),
                         ),
@@ -162,7 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onPressed: () {},
                     icon: Icon(
                       Icons.notifications_outlined,
-                      color: Colors.white.withValues(alpha: 229.5),
+                      color: Colors.white.withOpacity(0.9),
                     ),
                   ),
                 ],
@@ -226,7 +226,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: getStatusColor(_lastAttendance!.status).withValues(alpha: 25.5),
+                      color: getStatusColor(_lastAttendance!.status).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -364,7 +364,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: color.withValues(alpha: 20.4),
+      color: color.withOpacity(0.08),
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
@@ -377,7 +377,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 38.2),
+                  color: color.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(icon, color: color, size: 28),
@@ -434,7 +434,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Container(
                 width: 1,
                 height: 50,
-                color: Colors.white.withValues(alpha: 76.5),
+                color: Colors.white.withOpacity(0.3),
               ),
               _buildStatItem(
                 value: _getThisMonthCount(count),
@@ -471,7 +471,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withValues(alpha: 204.0),
+            color: Colors.white.withOpacity(0.8),
             fontFamily: 'Cairo',
           ),
         ),

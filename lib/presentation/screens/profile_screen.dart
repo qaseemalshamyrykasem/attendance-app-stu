@@ -294,7 +294,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                   // القسم
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedDepartment,
+                    value: _selectedDepartment,
                     disabledHint: Text(
                       _selectedDepartment ?? '',
                       style: const TextStyle(fontFamily: 'Cairo'),
@@ -318,7 +318,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                   // المستوى
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedLevel,
+                    value: _selectedLevel,
                     disabledHint: Text(
                       _selectedLevel ?? '',
                       style: const TextStyle(fontFamily: 'Cairo'),
@@ -432,7 +432,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final name = _nameController.text.trim();
     return CircleAvatar(
       radius: 56,
-      backgroundColor: AppColors.primary.withValues(alpha: 25.5),
+      backgroundColor: AppColors.primary.withOpacity(0.1),
       child: Text(
         name.isEmpty ? 'ط' : (name.length >= 2 ? name.substring(0, 2) : name),
         style: TextStyle(
