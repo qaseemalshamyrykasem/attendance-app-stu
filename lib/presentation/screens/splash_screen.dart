@@ -47,21 +47,31 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _navigateToNextScreen() async {
-    // انتظار لعرض شاشة البداية
-    await Future.delayed(const Duration(milliseconds: 2500));
+    try {
+      // 1. انتظار عرض الأنيميشن (2.5 ثانية)
+      await Future.delayed(const Duration(milliseconds: 2500));
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    // التحقق من إكمال الإعداد
-    final studentRepo = ref.read(studentRepositoryProvider);
-    final isSetupComplete = await studentRepo.isSetupComplete();
+      // 2. التحقق من حالة الإعداد مع مهلة زمنية (Timeout) لتجنب التعليق
+      final isSetupComplete = await ref
+          .read(studentRepositoryProvider)
+          .isSetupComplete()
+          .timeout(const Duration(seconds: 5), onTimeout: () => false);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (isSetupComplete) {
-      context.go(AppRoutes.home);
-    } else {
-      context.go(AppRoutes.setup);
+      // 3. الانتقال للشاشة المناسبة
+      if (isSetupComplete) {
+        context.go(AppRoutes.home);
+      } else {
+        context.go(AppRoutes.setup);
+      }
+    } catch (e) {
+      debugPrint('Error in splash navigation: $e');
+      if (mounted) {
+        context.go(AppRoutes.setup); // الانتقال للإعداد كخيار آمن
+      }
     }
   }
 

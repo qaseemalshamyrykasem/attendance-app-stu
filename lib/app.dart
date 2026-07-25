@@ -23,11 +23,8 @@ class _AttendanceStudentAppState extends ConsumerState<AttendanceStudentApp> {
   }
 
   Future<void> _initApp() async {
-    final notificationService = ref.read(notificationServiceProvider);
-    await notificationService.init();
-
-    final themeNotifier = ref.read(themeModeProvider.notifier);
-    await themeNotifier.loadThemeMode();
+    // تحميل وضع الثيم
+    await ref.read(themeModeProvider.notifier).loadThemeMode();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
