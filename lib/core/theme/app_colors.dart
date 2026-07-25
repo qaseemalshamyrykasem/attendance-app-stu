@@ -176,7 +176,7 @@ class AppThemeLight {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        dialogTheme: const DialogThemeData(
+        dialogTheme: DialogThemeData(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -319,9 +319,9 @@ class AppThemeDark {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        dialogTheme: const DialogThemeData(
+        dialogTheme: DialogThemeData(
           backgroundColor: AppColors.surfaceDark,
-          titleTextStyle: TextStyle(
+          titleTextStyle: const TextStyle(
             fontFamily: 'Cairo',
             color: AppColors.textPrimaryDark,
             fontSize: 20,
