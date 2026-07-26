@@ -180,18 +180,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       children: [
         DropdownButtonFormField<String>(
           value: _selectedDepartment,
-          enabled: _isEditing,
           decoration: const InputDecoration(labelText: 'القسم', prefixIcon: Icon(Icons.school)),
           items: AppConstants.departments.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-          onChanged: (v) => setState(() => _selectedDepartment = v),
+          onChanged: _isEditing ? (v) => setState(() => _selectedDepartment = v) : null,
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           value: _selectedLevel,
-          enabled: _isEditing,
           decoration: const InputDecoration(labelText: 'المستوى', prefixIcon: Icon(Icons.layers)),
           items: AppConstants.levels.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-          onChanged: (v) => setState(() => _selectedLevel = v),
+          onChanged: _isEditing ? (v) => setState(() => _selectedLevel = v) : null,
         ),
       ],
     );
