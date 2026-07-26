@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/di/di_setup.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
-import '../../data/models/attendance_model.dart';
+import '../../data/models/student_model.dart';
+import '../../domain/entities/attendance_entity.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -16,7 +16,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  AttendanceModel? _lastAttendance;
+  AttendanceEntity? _lastAttendance;
 
   @override
   void initState() {
@@ -30,15 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final history = await attendanceRepo.getAttendanceHistory(limit: 1);
       if (history.isNotEmpty && mounted) {
         setState(() {
-          _lastAttendance = AttendanceModel(
-            id: history.first.id,
-            sessionId: history.first.sessionId,
-            courseName: history.first.courseName,
-            date: history.first.date,
-            time: history.first.time,
-            status: history.first.status,
-            serverResponse: history.first.message,
-          );
+          _lastAttendance = history.first;
         });
       }
     } catch (e) {
@@ -78,12 +70,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('خطأ في تحميل البيانات: $err')),
+        error: (err, stack) => Center(child: Text('خطأ: $err')),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, dynamic student) {
+  Widget _buildHeader(BuildContext context, StudentModel? student) {
     final hour = DateTime.now().hour;
     String greeting = hour < 12 ? 'صباح الخير 👋' : 'مساء الخير 👋';
     
@@ -106,49 +98,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           CircleAvatar(
             radius: 32,
             backgroundColor: Colors.white.withValues(alpha: 0.2),
-            child: student?.photoPath != null
-                ? ClipOval(
-                    child: Image.file(
-                      File(student!.photoPath!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildDefaultAvatar(student),
-                    ),
-                  )
-                : _buildDefaultAvatar(student),
+            backgroundImage: (student?.photoPath != null && File(student!.photoPath!).existsSync()) 
+                ? FileImage(File(student.photoPath!)) 
+                : null,
+            child: (student?.photoPath == null || !File(student!.photoPath!).existsSync()) 
+                ? const Icon(Icons.person, color: Colors.white, size: 32) 
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  greeting,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontFamily: 'Cairo',
-                  ),
-                ),
+                Text(greeting, style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.8), fontFamily: 'Cairo')),
                 const SizedBox(height: 4),
-                Text(
-                  student?.name ?? 'طالب عزيز',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'Cairo',
-                  ),
-                ),
+                Text(student?.name ?? 'طالب عزيز', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Cairo')),
               ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildDefaultAvatar(dynamic student) {
-    return const Icon(Icons.person, color: Colors.white, size: 30);
   }
 
   Widget _buildLastAttendanceCard() {
@@ -160,10 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'آخر تسجيل حضور',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Cairo'),
-            ),
+            const Text('آخر تسجيل حضور', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
             const SizedBox(height: 16),
             if (_lastAttendance != null)
               ListTile(
@@ -172,11 +139,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   backgroundColor: AppColors.success.withValues(alpha: 0.1),
                   child: const Icon(Icons.check_circle, color: AppColors.success),
                 ),
-                title: Text(_lastAttendance!.courseName.isNotEmpty ? _lastAttendance!.courseName : 'تم التسجيل'),
-                subtitle: Text('${_lastAttendance!.date?.year}/${_lastAttendance!.date?.month}/${_lastAttendance!.date?.day} - ${_lastAttendance!.time}'),
+                title: Text((_lastAttendance!.courseName == null || _lastAttendance!.courseName!.isEmpty) ? 'تم تسجيل الحضور' : _lastAttendance!.courseName!),
+                subtitle: Text('${_lastAttendance!.time} - ${_lastAttendance!.statusArabic}'),
               )
             else
-              const Center(child: Text('لا يوجد سجلات بعد', style: TextStyle(fontFamily: 'Cairo', color: Colors.grey))),
+              const Center(child: Text('لا يوجد سجلات حضور', style: TextStyle(fontFamily: 'Cairo', color: Colors.grey))),
           ],
         ),
       ),
@@ -211,6 +178,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildActionCard({required IconData icon, required String title, required Color color, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
@@ -234,7 +202,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
       ),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,

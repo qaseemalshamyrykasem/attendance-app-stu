@@ -4,10 +4,10 @@ import '../../presentation/screens/screens.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
-  static final _homeNavKey = GlobalKey<NavigatorState>();
-  static final _historyNavKey = GlobalKey<NavigatorState>();
-  static final _profileNavKey = GlobalKey<NavigatorState>();
-  static final _settingsNavKey = GlobalKey<NavigatorState>();
+  static final _homeNavKey = GlobalKey<NavigatorState>(debugLabel: 'homeNav');
+  static final _historyNavKey = GlobalKey<NavigatorState>(debugLabel: 'historyNav');
+  static final _profileNavKey = GlobalKey<NavigatorState>(debugLabel: 'profileNav');
+  static final _settingsNavKey = GlobalKey<NavigatorState>(debugLabel: 'settingsNav');
 
   static GoRouter createRouter() {
     return GoRouter(
@@ -29,7 +29,7 @@ class AppRouter {
           builder: (context, state) => const SetupScreen(),
         ),
         
-        // الهيكل الرئيسي مع 4 فروع مستقلة
+        // الهيكل الرئيسي
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => 
               MainShell(navigationShell: navigationShell),
@@ -138,23 +138,32 @@ class AppRouter {
 
 class AppRoutes {
   static const String splash = '/splash';
-  static const String splashName = 'splash';
+  static const String splashName = 'splash_screen';
+  
   static const String setup = '/setup';
-  static const String setupName = 'setup';
+  static const String setupName = 'setup_screen';
+  
   static const String home = '/home';
-  static const String homeName = 'home';
+  static const String homeName = 'home_screen';
+  
   static const String scan = 'scan';
-  static const String scanName = 'scan';
+  static const String scanName = 'scan_page';
+  
   static const String connect = 'connect';
-  static const String connectName = 'connect';
+  static const String connectName = 'connect_page';
+  
   static const String attendanceStatus = 'attendance-status';
-  static const String attendanceStatusName = 'attendance-status';
+  static const String attendanceStatusName = 'status_page';
+  
   static const String history = '/history';
-  static const String historyName = 'history';
+  static const String historyName = 'history_screen';
+  
   static const String profile = '/profile';
-  static const String profileName = 'profile';
+  static const String profileName = 'profile_screen';
+  
   static const String settings = '/settings';
-  static const String settingsName = 'settings';
+  static const String settingsName = 'settings_screen';
+  
   static const String about = 'about';
-  static const String aboutName = 'about';
+  static const String aboutName = 'about_page';
 }
