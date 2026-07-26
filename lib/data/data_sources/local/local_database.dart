@@ -19,7 +19,6 @@ class StudentProfiles extends Table {
   TextColumn get studentId => text().named('student_id')();
   TextColumn get department => text()();
   TextColumn get level => text()();
-  TextColumn get section => text()();
   TextColumn get phone => text().nullable()();
   TextColumn get photoPath => text().named('photo_path').nullable()();
   IntColumn get isSetupComplete => integer().named('is_setup_complete').withDefault(const Constant(0))();

@@ -77,7 +77,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           studentId: _studentIdController.text.trim(),
           department: _selectedDepartment!,
           level: _selectedLevel!,
-          section: _sectionController.text.trim(),
           phone: _phoneController.text.trim(),
           photoPath: _selectedImage?.path,
           isSetupComplete: true,
@@ -123,12 +122,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               ),
               const SizedBox(height: 16),
               _buildDropdowns(),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _sectionController,
-                decoration: const InputDecoration(labelText: 'الشعبة *', prefixIcon: Icon(Icons.group)),
-                validator: (v) => (v == null || v.isEmpty) ? 'الشعبة مطلوبة' : null,
-              ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,

@@ -123,7 +123,6 @@ class _ManualConnectScreenState extends ConsumerState<ManualConnectScreen> {
           'name': student.name,
           'department': student.department,
           'level': student.level,
-          'section': student.section,
         },
       );
 

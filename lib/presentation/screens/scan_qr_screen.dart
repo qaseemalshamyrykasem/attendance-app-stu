@@ -121,7 +121,6 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
           'name': student.name,
           'department': student.department,
           'level': student.level,
-          'section': student.section,
         },
       );
 

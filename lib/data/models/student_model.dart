@@ -14,7 +14,6 @@ class StudentModel with _$StudentModel {
     required String studentId,
     required String department,
     required String level,
-    required String section,
     String? phone,
     String? photoPath,
     @Default(false) bool isSetupComplete,
@@ -33,7 +32,6 @@ class StudentModel with _$StudentModel {
         studentId: '',
         department: '',
         level: '',
-        section: '',
       );
 }
 
@@ -45,7 +43,6 @@ extension StudentModelExtension on StudentModel {
         'student_id': studentId,
         'department': department,
         'level': level,
-        'section': section,
         'phone': phone,
         'photo_path': photoPath,
         'is_setup_complete': isSetupComplete ? 1 : 0,
@@ -60,7 +57,6 @@ extension StudentModelExtension on StudentModel {
         studentId: map['student_id'] as String,
         department: map['department'] as String,
         level: map['level'] as String,
-        section: map['section'] as String,
         phone: map['phone'] as String?,
         photoPath: map['photo_path'] as String?,
         isSetupComplete: (map['is_setup_complete'] as int?) == 1,

@@ -76,7 +76,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         studentId: _studentIdController.text.trim(),
         department: _selectedDepartment!,
         level: _selectedLevel!,
-        section: _sectionController.text.trim(),
         phone: _phoneController.text.trim(),
         photoPath: _newImage?.path ?? currentStudent.photoPath,
       );
@@ -127,8 +126,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _buildTextField(_studentIdController, 'الرقم الجامعي', Icons.badge),
                   const SizedBox(height: 16),
                   _buildDropdowns(),
-                  const SizedBox(height: 16),
-                  _buildTextField(_sectionController, 'الشعبة', Icons.group),
                   const SizedBox(height: 32),
                   if (_isEditing)
                     SizedBox(
