@@ -11,8 +11,8 @@ class AppConstants {
 
   // إعدادات الشبكة الافتراضية
   static const int defaultPort = 8080;
-  static const int connectionTimeout = 10000; // 10 ثواني
-  static const int receiveTimeout = 15000; // 15 ثانية
+  static const int connectionTimeout = 15000; // 15 ثانية
+  static const int receiveTimeout = 20000; // 20 ثانية
 
   // مفاتيح التخزين المحلي
   static const String keyIsSetupComplete = 'is_setup_complete';

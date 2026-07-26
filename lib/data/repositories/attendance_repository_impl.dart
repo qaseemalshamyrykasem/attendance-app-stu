@@ -1,6 +1,3 @@
-/// تنفيذ مخزن بيانات الحضور
-library;
-
 import 'package:drift/drift.dart';
 import '../../core/constants/app_constants.dart';
 import '../../data/data_sources/local/local_database.dart';
@@ -27,15 +24,20 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     String? sessionToken,
     required Map<String, dynamic> studentData,
   }) async {
-    // تسجيل محاولة الاتصال
     await _logConnectionAttempt(ip, port, 'pending');
 
     try {
-      final payload = Map<String, dynamic>.from(studentData);
-      payload['session_token'] = sessionToken ?? studentData['session_token'] ?? sessionId;
-      payload['timestamp'] = DateTime.now().toIso8601String();
+      // إعداد البيانات المرسلة لتوافق تطبيق المندوب تماماً
+      final payload = {
+        'session_id': sessionId,
+        'session_token': sessionToken ?? sessionId,
+        'student_id': studentData['student_id'],
+        'student_name': studentData['name'],
+        'department': studentData['department'],
+        'level': studentData['level'],
+        'timestamp': DateTime.now().toIso8601String(),
+      };
 
-      // إرسال بيانات الحضور للخادم
       final response = await _httpClient.postAttendance(
         ipAddress: ip,
         port: port,
@@ -43,14 +45,12 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       );
 
       if (response.success) {
-        // تحديث سجل الاتصال كنجاح
         await _updateConnectionLog(ip: ip, port: port, status: 'success');
 
-        // حفظ سجل الحضور المحلي
         final attendanceRecord = AttendanceModel(
           id: _generateId(),
           sessionId: sessionId,
-          courseName: studentData['course_name'] ?? '',
+          courseName: response.data?['course_name'] ?? studentData['course_name'] ?? '',
           date: DateTime.now(),
           time: _getCurrentTime(),
           status: AppConstants.statusPresent,
@@ -73,81 +73,34 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
           isSuccess: true,
         );
       } else {
-        // فشل في الحضور
-        String status = AppConstants.connectionFailed;
-        
-        if (response.message.contains('مسجل') || 
-            response.message.contains('مسبقا')) {
-          status = AppConstants.connectionDuplicate;
-        } else if (response.message.contains('مغلقة') || 
-                   response.message.contains('انتهت')) {
-          status = AppConstants.sessionClosed;
-        }
-
-        await _updateConnectionLog(
-          ip: ip, 
-          port: port, 
-          status: 'failed',
-          error: response.message,
-        );
-
-        // حفظ سجل الفشل
-        final failedRecord = AttendanceModel(
+        await _updateConnectionLog(ip: ip, port: port, status: 'failed', error: response.message);
+        return AttendanceEntity(
           id: _generateId(),
           sessionId: sessionId,
-          courseName: studentData['course_name'] ?? '',
           date: DateTime.now(),
           time: _getCurrentTime(),
           status: 'failed',
-          serverResponse: response.message,
-          isSynced: false,
-          createdAt: DateTime.now(),
-        );
-
-        await _addAttendanceRecord(failedRecord);
-
-        return AttendanceEntity(
-          id: failedRecord.id,
-          sessionId: sessionId,
-          courseName: failedRecord.courseName,
-          date: failedRecord.date!,
-          time: failedRecord.time ?? '',
-          status: status,
           message: response.message,
           isSuccess: false,
         );
       }
     } catch (e) {
-      // خطأ في الاتصال
-      await _updateConnectionLog(
-        ip: ip, 
-        port: port, 
-        status: 'timeout',
-        error: e.toString(),
-      );
-
+      await _updateConnectionLog(ip: ip, port: port, status: 'timeout', error: e.toString());
       return AttendanceEntity(
         id: _generateId(),
         sessionId: sessionId,
         date: DateTime.now(),
         time: _getCurrentTime(),
-        status: AppConstants.connectionFailed,
-        message: AppMessages.noConnection,
+        status: 'failed',
+        message: 'فشل الاتصال بالمندوب، تأكد من أنك على نفس الشبكة',
         isSuccess: false,
       );
     }
   }
 
   @override
-  Future<List<AttendanceEntity>> getAttendanceHistory({
-    int? limit,
-    int? offset,
-  }) async {
-    final records = await _database.getAllAttendanceRecords(
-      limit: limit,
-      offset: offset,
-    );
-
+  Future<List<AttendanceEntity>> getAttendanceHistory({int? limit, int? offset}) async {
+    final records = await _database.getAllAttendanceRecords(limit: limit, offset: offset);
     return records.map((record) => AttendanceEntity(
       id: record.id,
       sessionId: record.sessionId,
@@ -161,15 +114,8 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   }
 
   @override
-  Future<List<AttendanceEntity>> searchAttendanceRecords({
-    String? dateQuery,
-    String? statusFilter,
-  }) async {
-    final records = await _database.searchAttendanceRecords(
-      dateQuery: dateQuery,
-      statusFilter: statusFilter,
-    );
-
+  Future<List<AttendanceEntity>> searchAttendanceRecords({String? dateQuery, String? statusFilter}) async {
+    final records = await _database.searchAttendanceRecords(statusFilter: statusFilter);
     return records.map((record) => AttendanceEntity(
       id: record.id,
       sessionId: record.sessionId,
@@ -188,16 +134,10 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   }
 
   @override
-  Future<int> getAttendanceCount() async {
-    return await _database.getAttendanceCount();
-  }
+  Future<int> getAttendanceCount() async => await _database.getAttendanceCount();
 
   @override
-  Future<void> clearHistory() async {
-    await _database.clearAttendanceHistory();
-  }
-
-  // ==================== طرق مساعدة ====================
+  Future<void> clearHistory() async => await _database.clearAttendanceHistory();
 
   Future<void> _addAttendanceRecord(AttendanceModel record) async {
     await _database.addAttendanceRecord(AttendanceHistoryTableCompanion(
@@ -224,12 +164,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     ));
   }
 
-  Future<void> _updateConnectionLog({
-    required String ip,
-    required int port,
-    required String status,
-    String? error,
-  }) async {
+  Future<void> _updateConnectionLog({required String ip, required int port, required String status, String? error}) async {
     await _database.addConnectionLog(ConnectionLogsTableCompanion(
       id: Value(_generateId()),
       ip: Value(ip),
@@ -240,10 +175,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     ));
   }
 
-  String _generateId() {
-    return '${DateTime.now().millisecondsSinceEpoch}_${DateTime.now().microsecond}';
-  }
-
+  String _generateId() => '${DateTime.now().millisecondsSinceEpoch}_${DateTime.now().microsecond}';
   String _getCurrentTime() {
     final now = DateTime.now();
     return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';

@@ -22,7 +22,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   final _nameController = TextEditingController();
   final _studentIdController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _sectionController = TextEditingController();
 
   String? _selectedDepartment;
   String? _selectedLevel;
@@ -34,7 +33,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     _nameController.dispose();
     _studentIdController.dispose();
     _phoneController.dispose();
-    _sectionController.dispose();
     super.dispose();
   }
 
@@ -84,7 +82,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         ),
       );
 
-      // هندسياً: يجب تحديث الـ Provider قبل الانتقال
       ref.invalidate(currentStudentProvider);
       await ref.read(currentStudentProvider.future);
 

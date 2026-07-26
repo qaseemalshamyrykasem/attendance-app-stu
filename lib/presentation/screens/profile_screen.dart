@@ -25,7 +25,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _studentIdController;
   late TextEditingController _phoneController;
-  late TextEditingController _sectionController;
   
   String? _selectedDepartment;
   String? _selectedLevel;
@@ -37,7 +36,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _nameController = TextEditingController();
     _studentIdController = TextEditingController();
     _phoneController = TextEditingController();
-    _sectionController = TextEditingController();
   }
 
   @override
@@ -45,7 +43,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _nameController.dispose();
     _studentIdController.dispose();
     _phoneController.dispose();
-    _sectionController.dispose();
     super.dispose();
   }
 
@@ -53,7 +50,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _nameController.text = student.name;
     _studentIdController.text = student.studentId;
     _phoneController.text = student.phone ?? '';
-    _sectionController.text = student.section;
     _selectedDepartment ??= student.department;
     _selectedLevel ??= student.level;
   }
