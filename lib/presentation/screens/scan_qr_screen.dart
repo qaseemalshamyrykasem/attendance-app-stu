@@ -104,8 +104,8 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
       }
 
       // الانتقال لشاشة الحالة أثناء المعالجة
-      context.push(
-        '/home/${AppRoutes.attendanceStatusName}',
+      context.pushNamed(
+        AppRoutes.attendanceStatusName,
         extra: {'status': 'pending', 'message': 'جاري تسجيل الحضور...'},
       );
 
@@ -129,8 +129,8 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
       // تحديث شاشة الحالة بالنتيجة
       context.pop(); // إغلاق شاشة التحميل
       
-      context.push(
-        '/home/${AppRoutes.attendanceStatusName}',
+      context.pushNamed(
+        AppRoutes.attendanceStatusName,
         extra: {
           'status': result.isSuccess ? 'success' : result.status,
           'message': result.message,

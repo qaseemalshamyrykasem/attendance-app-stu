@@ -106,8 +106,8 @@ class _ManualConnectScreenState extends ConsumerState<ManualConnectScreen> {
       }
 
       // الانتقال لشاشة الحالة
-      context.push(
-        '/home/${AppRoutes.attendanceStatusName}',
+      context.pushNamed(
+        AppRoutes.attendanceStatusName,
         extra: {'status': 'pending', 'message': 'جاري الاتصال...'},
       );
 
@@ -130,8 +130,8 @@ class _ManualConnectScreenState extends ConsumerState<ManualConnectScreen> {
 
       context.pop(); // إغلاق التحميل
 
-      context.push(
-        '/home/${AppRoutes.attendanceStatusName}',
+      context.pushNamed(
+        AppRoutes.attendanceStatusName,
         extra: {
           'status': result.isSuccess ? 'success' : result.status,
           'message': result.message,
