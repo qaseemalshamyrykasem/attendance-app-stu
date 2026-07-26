@@ -4,10 +4,7 @@ import '../../presentation/screens/screens.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
-  static final _homeNavKey = GlobalKey<NavigatorState>(debugLabel: 'homeNav');
-  static final _historyNavKey = GlobalKey<NavigatorState>(debugLabel: 'historyNav');
-  static final _profileNavKey = GlobalKey<NavigatorState>(debugLabel: 'profileNav');
-  static final _settingsNavKey = GlobalKey<NavigatorState>(debugLabel: 'settingsNav');
+  static final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
   static GoRouter createRouter() {
     return GoRouter(
@@ -15,63 +12,54 @@ class AppRouter {
       navigatorKey: _rootNavigatorKey,
       debugLogDiagnostics: true,
       routes: [
-        // شاشة البداية
+        // 1. مسارات مستقلة (Full Screen)
         GoRoute(
           path: AppRoutes.splash,
           name: AppRoutes.splashName,
           builder: (context, state) => const SplashScreen(),
         ),
-        
-        // الإعداد الأولي
         GoRoute(
           path: AppRoutes.setup,
           name: AppRoutes.setupName,
           builder: (context, state) => const SetupScreen(),
         ),
-        
-        // الهيكل الرئيسي
+        GoRoute(
+          path: AppRoutes.scan,
+          name: AppRoutes.scanName,
+          builder: (context, state) => const ScanQrScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.connect,
+          name: AppRoutes.connectName,
+          builder: (context, state) => const ManualConnectScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.attendanceStatus,
+          name: AppRoutes.attendanceStatusName,
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            return AttendanceStatusScreen(
+              status: extra?['status'] ?? '',
+              message: extra?['message'] ?? '',
+            );
+          },
+        ),
+
+        // 2. الهيكل الرئيسي (مع القائمة السفلية)
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => 
               MainShell(navigationShell: navigationShell),
           branches: [
-            // الفرع 1: الرئيسية
             StatefulShellBranch(
-              navigatorKey: _homeNavKey,
               routes: [
                 GoRoute(
                   path: AppRoutes.home,
                   name: AppRoutes.homeName,
                   builder: (context, state) => const HomeScreen(),
-                  routes: [
-                    GoRoute(
-                      path: 'scan',
-                      name: AppRoutes.scanName,
-                      builder: (context, state) => const ScanQrScreen(),
-                    ),
-                    GoRoute(
-                      path: 'connect',
-                      name: AppRoutes.connectName,
-                      builder: (context, state) => const ManualConnectScreen(),
-                    ),
-                    GoRoute(
-                      path: 'attendance-status',
-                      name: AppRoutes.attendanceStatusName,
-                      builder: (context, state) {
-                        final extra = state.extra as Map<String, dynamic>?;
-                        return AttendanceStatusScreen(
-                          status: extra?['status'] ?? '',
-                          message: extra?['message'] ?? '',
-                        );
-                      },
-                    ),
-                  ],
                 ),
               ],
             ),
-            
-            // الفرع 2: السجل
             StatefulShellBranch(
-              navigatorKey: _historyNavKey,
               routes: [
                 GoRoute(
                   path: AppRoutes.history,
@@ -80,10 +68,7 @@ class AppRouter {
                 ),
               ],
             ),
-
-            // الفرع 3: الملف الشخصي
             StatefulShellBranch(
-              navigatorKey: _profileNavKey,
               routes: [
                 GoRoute(
                   path: AppRoutes.profile,
@@ -92,10 +77,7 @@ class AppRouter {
                 ),
               ],
             ),
-
-            // الفرع 4: الإعدادات
             StatefulShellBranch(
-              navigatorKey: _settingsNavKey,
               routes: [
                 GoRoute(
                   path: AppRoutes.settings,
@@ -115,22 +97,8 @@ class AppRouter {
         ),
       ],
       
-      errorBuilder: (context, state) => Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-              const SizedBox(height: 16),
-              const Text('الصفحة غير موجودة', style: TextStyle(fontFamily: 'Cairo', fontSize: 18)),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => context.go(AppRoutes.splash),
-                child: const Text('العودة للبداية', style: TextStyle(fontFamily: 'Cairo')),
-              ),
-            ],
-          ),
-        ),
+      errorBuilder: (context, state) => const Scaffold(
+        body: Center(child: Text('عذراً، حدث خطأ في المسار')),
       ),
     );
   }
@@ -138,32 +106,23 @@ class AppRouter {
 
 class AppRoutes {
   static const String splash = '/splash';
-  static const String splashName = 'splash_screen';
-  
+  static const String splashName = 'splash';
   static const String setup = '/setup';
-  static const String setupName = 'setup_screen';
-  
+  static const String setupName = 'setup';
   static const String home = '/home';
-  static const String homeName = 'home_screen';
-  
-  static const String scan = 'scan';
-  static const String scanName = 'scan_page';
-  
-  static const String connect = 'connect';
-  static const String connectName = 'connect_page';
-  
-  static const String attendanceStatus = 'attendance-status';
-  static const String attendanceStatusName = 'status_page';
-  
+  static const String homeName = 'home';
+  static const String scan = '/scan';
+  static const String scanName = 'scan';
+  static const String connect = '/connect';
+  static const String connectName = 'connect';
+  static const String attendanceStatus = '/status';
+  static const String attendanceStatusName = 'status';
   static const String history = '/history';
-  static const String historyName = 'history_screen';
-  
+  static const String historyName = 'history';
   static const String profile = '/profile';
-  static const String profileName = 'profile_screen';
-  
+  static const String profileName = 'profile';
   static const String settings = '/settings';
-  static const String settingsName = 'settings_screen';
-  
+  static const String settingsName = 'settings';
   static const String about = 'about';
-  static const String aboutName = 'about_page';
+  static const String aboutName = 'about';
 }
