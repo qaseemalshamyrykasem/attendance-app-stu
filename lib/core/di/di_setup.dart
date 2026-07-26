@@ -1,6 +1,3 @@
-/// إعداد حقن التبعيات (Dependency Injection)
-library;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/data_sources/local/local_database.dart';
@@ -14,43 +11,18 @@ import '../../domain/repositories/attendance_repository.dart';
 import '../../domain/repositories/settings_repository.dart';
 import '../../services/network/http_client.dart';
 import '../../services/notification/notification_service.dart';
+import '../../data/models/student_model.dart';
 
-// ==================== قاعدة البيانات ====================
+// قاعدة البيانات
+final databaseProvider = Provider<AppDatabase>((ref) => AppDatabase());
 
-/// Provider لقاعدة البيانات
-final databaseProvider = Provider<AppDatabase>((ref) {
-  return AppDatabase();
-});
+// الخدمات
+final hiveServiceProvider = Provider<HiveService>((ref) => HiveService.instance);
+final sharedPrefsProvider = Provider<SharedPrefsService>((ref) => SharedPrefsService.instance);
+final httpClientProvider = Provider<HttpClient>((ref) => HttpClient());
+final notificationServiceProvider = Provider<NotificationService>((ref) => NotificationService());
 
-// ==================== الخدمات المحلية ====================
-
-/// Provider لخدمة Hive
-final hiveServiceProvider = Provider<HiveService>((ref) {
-  return HiveService.instance;
-});
-
-/// Provider لخدمة SharedPreferences
-final sharedPrefsProvider = Provider<SharedPrefsService>((ref) {
-  return SharedPrefsService.instance;
-});
-
-// ==================== HTTP Client ====================
-
-/// Provider للعميل HTTP
-final httpClientProvider = Provider<HttpClient>((ref) {
-  return HttpClient();
-});
-
-// ==================== الإشعارات ====================
-
-/// Provider لخدمة الإشعارات
-final notificationServiceProvider = Provider<NotificationService>((ref) {
-  return NotificationService();
-});
-
-// ==================== Repositories ====================
-
-/// Provider لمخزن بيانات الطالب
+// المستودعات (Repositories)
 final studentRepositoryProvider = Provider<StudentRepository>((ref) {
   final db = ref.watch(databaseProvider);
   final hive = ref.watch(hiveServiceProvider);
@@ -58,21 +30,30 @@ final studentRepositoryProvider = Provider<StudentRepository>((ref) {
   return StudentRepositoryImpl(database: db, hive: hive, prefs: prefs);
 });
 
-/// Provider لمخزن بيانات الحضور
 final attendanceRepositoryProvider = Provider<AttendanceRepository>((ref) {
   final db = ref.watch(databaseProvider);
   final http = ref.watch(httpClientProvider);
   return AttendanceRepositoryImpl(database: db, httpClient: http);
 });
 
-/// Provider لمخزن الإعدادات
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   final prefs = ref.watch(sharedPrefsProvider);
   final db = ref.watch(databaseProvider);
   return SettingsRepositoryImpl(prefs: prefs, database: db);
 });
 
-// ==================== الثيم ====================
+// ==================== البروفايدرز التفاعلية (Reactive) ====================
+
+/// موفر بيانات الطالب الحالي - يتحدث تلقائياً
+final currentStudentProvider = FutureProvider<StudentModel?>((ref) async {
+  final repo = ref.watch(studentRepositoryProvider);
+  return await repo.getStudent();
+});
+
+/// موفر حالة الثيم
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+  return ThemeModeNotifier(ref.read(settingsRepositoryProvider));
+});
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   final SettingsRepository _settingsRepository;
@@ -80,32 +61,14 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 
   Future<void> loadThemeMode() async {
     final mode = await _settingsRepository.getThemeMode();
-    if (mode != null) {
-      switch (mode) {
-        case 'light':
-          state = ThemeMode.light;
-          break;
-        case 'dark':
-          state = ThemeMode.dark;
-          break;
-        default:
-          state = ThemeMode.system;
-      }
-    }
+    if (mode == 'light') state = ThemeMode.light;
+    else if (mode == 'dark') state = ThemeMode.dark;
+    else state = ThemeMode.system;
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
-    final modeString = mode == ThemeMode.light
-        ? 'light'
-        : mode == ThemeMode.dark
-            ? 'dark'
-            : 'system';
+    final modeString = mode == ThemeMode.light ? 'light' : mode == ThemeMode.dark ? 'dark' : 'system';
     await _settingsRepository.setThemeMode(modeString);
     state = mode;
   }
 }
-
-final themeModeProvider =
-    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
-  return ThemeModeNotifier(ref.read(settingsRepositoryProvider));
-});
