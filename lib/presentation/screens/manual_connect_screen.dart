@@ -88,14 +88,16 @@ class _ManualConnectScreenState extends ConsumerState<ManualConnectScreen> {
                 controller: _portController,
                 decoration: const InputDecoration(labelText: 'المنفذ (Port)', prefixIcon: Icon(Icons.numbers)),
                 keyboardType: TextInputType.number,
-                initialValue: null, // سيتم ملؤه يدوياً أو نضع 8080 كافتراضي
                 validator: (v) => (v == null || v.isEmpty) ? 'مطلوب' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _tokenController,
-                decoration: const InputDecoration(labelText: 'معرف الجلسة / التوكن (اختياري)', prefixIcon: Icon(Icons.vpn_key)),
-                hintText: 'اتركه فارغاً إذا لم يزودك المندوب به',
+                decoration: const InputDecoration(
+                  labelText: 'معرف الجلسة / التوكن (اختياري)',
+                  prefixIcon: Icon(Icons.vpn_key),
+                  hintText: 'اتركه فارغاً إذا لم يزودك المندوب به',
+                ),
               ),
               const SizedBox(height: 32),
               SizedBox(
