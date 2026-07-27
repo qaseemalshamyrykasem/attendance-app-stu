@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../core/di/di_setup.dart';
 import '../../core/router/app_router.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/utils/helpers.dart';
 
 class ScanQrScreen extends ConsumerStatefulWidget {
@@ -19,28 +18,22 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
   final MobileScannerController _controller = MobileScannerController();
   bool _isProcessing = false;
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   Future<void> _processQRCode(String qrData) async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
     try {
       final qrInfo = _parseQRData(qrData);
-      if (!qrInfo['isValid']) throw Exception('كود غير صالح');
+      if (!qrInfo['isValid']) throw Exception('كود QR غير صالح أو غير مدعوم');
 
       final student = await ref.read(studentRepositoryProvider).getStudent();
-      if (student == null) throw Exception('يرجى إعداد الملف الشخصي');
+      if (student == null) throw Exception('يرجى إعداد الملف الشخصي أولاً');
 
-      final attendanceRepo = ref.read(attendanceRepositoryProvider);
-      final result = await attendanceRepo.submitAttendance(
+      final result = await ref.read(attendanceRepositoryProvider).submitAttendance(
         ip: qrInfo['ip'],
         port: qrInfo['port'],
         sessionId: qrInfo['sessionId'],
+        sessionToken: qrInfo['token'], // تمرير التوكن الحقيقي
         studentData: {
           'student_id': student.studentId,
           'name': student.name,
@@ -50,18 +43,13 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
       );
 
       if (!mounted) return;
-
-      // الانتقال لشاشة الحالة باستخدام الاسم الجديد والمسار المطلق
       context.pushReplacementNamed(
         AppRoutes.attendanceStatusName,
-        extra: {
-          'status': result.isSuccess ? 'success' : 'failed',
-          'message': result.message,
-        },
+        extra: {'status': result.isSuccess ? 'success' : 'failed', 'message': result.message},
       );
     } catch (e) {
       if (mounted) {
-        AppHelpers.showSnackBar(context, message: 'خطأ: $e');
+        AppHelpers.showSnackBar(context, message: e.toString().replaceAll('Exception: ', ''));
         setState(() => _isProcessing = false);
       }
     }
@@ -69,12 +57,29 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
 
   Map<String, dynamic> _parseQRData(String qrData) {
     try {
+      // 1. تجربة فك تشفير Base64 (الصيغة الجديدة للمندوب)
+      try {
+        final decoded = utf8.decode(base64Decode(qrData));
+        final json = jsonDecode(decoded);
+        if (json['ip'] != null && json['port'] != null) {
+          return {
+            'ip': json['ip'],
+            'port': int.parse(json['port'].toString()),
+            'token': json['token'], // التوكن الحقيقي
+            'sessionId': json['sessionId'] ?? json['token'],
+            'isValid': true,
+          };
+        }
+      } catch (_) {}
+
+      // 2. الفشل في Base64، تجربة الصيغة البسيطة (Fallback)
       final parts = qrData.split(':');
       if (parts.length >= 3) {
         return {
           'ip': parts[0],
           'port': int.parse(parts[1]),
           'sessionId': parts[2],
+          'token': parts[2],
           'isValid': true,
         };
       }
@@ -91,17 +96,15 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
           MobileScanner(
             controller: _controller,
             onDetect: (capture) {
-              final List<Barcode> barcodes = capture.barcodes;
-              for (final barcode in barcodes) {
-                if (barcode.rawValue != null) {
-                  _processQRCode(barcode.rawValue!);
-                  break;
-                }
-              }
+              final barcode = capture.barcodes.first;
+              if (barcode.rawValue != null) _processQRCode(barcode.rawValue!);
             },
           ),
           if (_isProcessing)
-            const Center(child: CircularProgressIndicator(color: Colors.white)),
+            Container(
+              color: Colors.black54,
+              child: const Center(child: CircularProgressIndicator(color: Colors.white)),
+            ),
         ],
       ),
     );
