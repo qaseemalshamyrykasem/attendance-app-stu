@@ -1,4 +1,6 @@
 import 'package:drift/drift.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 import '../../core/constants/app_constants.dart';
 import '../../data/data_sources/local/local_database.dart';
 import '../../data/models/attendance_model.dart';
@@ -27,15 +29,23 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     await _logConnectionAttempt(ip, port, 'pending');
 
     try {
-      // إعداد البيانات المرسلة لتوافق تطبيق المندوب تماماً
+      // الحصول على Device ID (مهم جداً للمندوب)
+      String deviceId = 'unknown_device';
+      final deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        deviceId = androidInfo.id;
+      }
+
+      // إعداد البيانات المرسلة لتوافق تطبيق المندوب (حسب كلاس CheckInRequest)
       final payload = {
-        'session_id': sessionId,
-        'session_token': sessionToken ?? sessionId,
         'student_id': studentData['student_id'],
-        'student_name': studentData['name'],
-        'department': studentData['department'],
-        'level': studentData['level'],
+        'session_token': sessionToken ?? sessionId,
+        'device_id': deviceId,
         'timestamp': DateTime.now().toIso8601String(),
+        // حقول إضافية للمندوب (إضافية)
+        'student_name': studentData['name'],
+        'session_id': sessionId,
       };
 
       final response = await _httpClient.postAttendance(
@@ -92,11 +102,13 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
         date: DateTime.now(),
         time: _getCurrentTime(),
         status: 'failed',
-        message: 'فشل الاتصال بالمندوب، تأكد من أنك على نفس الشبكة',
+        message: 'فشل الاتصال بالمندوب، تأكد من التواجد على نفس الشبكة',
         isSuccess: false,
       );
     }
   }
+
+  // ... (بقية الدوال تبقى كما هي)
 
   @override
   Future<List<AttendanceEntity>> getAttendanceHistory({int? limit, int? offset}) async {

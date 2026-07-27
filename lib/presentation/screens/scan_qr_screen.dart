@@ -24,16 +24,17 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
 
     try {
       final qrInfo = _parseQRData(qrData);
-      if (!qrInfo['isValid']) throw Exception('كود QR غير صالح أو غير مدعوم');
+      if (!qrInfo['isValid']) throw Exception('كود QR غير مدعوم أو تالف');
 
       final student = await ref.read(studentRepositoryProvider).getStudent();
       if (student == null) throw Exception('يرجى إعداد الملف الشخصي أولاً');
 
+      // إرسال التحضير للمندوب
       final result = await ref.read(attendanceRepositoryProvider).submitAttendance(
         ip: qrInfo['ip'],
         port: qrInfo['port'],
         sessionId: qrInfo['sessionId'],
-        sessionToken: qrInfo['token'], // تمرير التوكن الحقيقي
+        sessionToken: qrInfo['token'], // التوكن الحقيقي من المندوب
         studentData: {
           'student_id': student.studentId,
           'name': student.name,
@@ -57,29 +58,36 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
 
   Map<String, dynamic> _parseQRData(String qrData) {
     try {
-      // 1. تجربة فك تشفير Base64 (الصيغة الجديدة للمندوب)
+      // 1. محاولة فك تشفير base64Url (كما يفعل المندوب)
       try {
-        final decoded = utf8.decode(base64Decode(qrData));
+        // فلاتر تحتاج لتعديل الـ padding يدوياً أحياناً في base64Url
+        String normalized = qrData.replaceAll('-', '+').replaceAll('_', '/');
+        while (normalized.length % 4 != 0) { normalized += '='; }
+        
+        final decoded = utf8.decode(base64Decode(normalized));
         final json = jsonDecode(decoded);
-        if (json['ip'] != null && json['port'] != null) {
+        
+        if (json['token'] != null && json['ip'] != null) {
           return {
             'ip': json['ip'],
             'port': int.parse(json['port'].toString()),
-            'token': json['token'], // التوكن الحقيقي
-            'sessionId': json['sessionId'] ?? json['token'],
+            'token': json['token'],
+            'sessionId': json['sessionId'] ?? json['token'].toString().split('_').first,
             'isValid': true,
           };
         }
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('Base64Url parse failed: $e');
+      }
 
-      // 2. الفشل في Base64، تجربة الصيغة البسيطة (Fallback)
+      // 2. محاولة الصيغة البسيطة (Fallback)
       final parts = qrData.split(':');
       if (parts.length >= 3) {
         return {
           'ip': parts[0],
           'port': int.parse(parts[1]),
-          'sessionId': parts[2],
           'token': parts[2],
+          'sessionId': parts[2],
           'isValid': true,
         };
       }
@@ -101,10 +109,7 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
             },
           ),
           if (_isProcessing)
-            Container(
-              color: Colors.black54,
-              child: const Center(child: CircularProgressIndicator(color: Colors.white)),
-            ),
+            Container(color: Colors.black54, child: const Center(child: CircularProgressIndicator(color: Colors.white))),
         ],
       ),
     );
